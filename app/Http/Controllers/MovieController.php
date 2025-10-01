@@ -90,13 +90,14 @@ public function update_image_movie_ajax(Request $request){
 }
     public function index()
     {
-        $list = Movie::with('category','genre','country','movie_genre')->withCount('episode')->orderBy('id','DESC')->get();
-        // return response()->json($list);
-        //count
+        $list = Movie::with('category','genre','country','movie_genre')->addSelect([
+        'episode_count' => Episode::selectRaw('MAX(CAST(episode as UNSIGNED))')
+            ->whereColumn('movie_id', 'movies.id')
+    ])->orderBy('id','DESC')->get();
         $category=Category::pluck('title','id');
         $country=Country::pluck('title','id');
         $path=public_path()."/json/";
-        if(!is_dir($path)) { 
+        if(!is_dir($path)) {
             mkdir($path,0777,true);
          }
         File::put($path.'movies.json',json_encode($list));
@@ -148,18 +149,18 @@ public function update_image_movie_ajax(Request $request){
             </a>
             <div class="viewsCount" style="color: #9d9d9d;">'.$mov->count_views.'<ion-icon name="eye-sharp"></ion-icon> lượt xem</div>
              <div style="float: left;">
-                    
+
              <ul class="list-inline rating"  title="Average Rating">
              ';
                                                     for($count=1; $count<=5; $count++){
 
                                                     $output.='<li title="star_rating" style="
-                                                    font-size:20px;color:#ffcc00;padding: 0" 
+                                                    font-size:20px;color:#ffcc00;padding: 0"
 
                                                             >&#9733;
                                                             </li>';
                                                     }
-                                                
+
                                                   $output.='<ul class="list-inline rating"  title="Average Rating">
                    </div>
          </div>';
@@ -193,18 +194,18 @@ public function update_image_movie_ajax(Request $request){
                <p class="title">'.$mov->title.'</p>
             </a>
             <div class="viewsCount" style="color: #9d9d9d;">'.$mov->count_views.'<ion-icon name="eye-sharp"></ion-icon> lượt xem</div>
-             <div style="float: left;">          
+             <div style="float: left;">
          <ul class="list-inline rating"  title="Average Rating">
              ';
                                                     for($count=1; $count<=5; $count++){
 
                                                     $output.='<li title="star_rating" style="
-                                                    font-size:20px;color:#ffcc00;padding: 0" 
+                                                    font-size:20px;color:#ffcc00;padding: 0"
 
                                                             >&#9733;
                                                             </li>';
                                                     }
-                                                
+
                                                   $output.='<ul class="list-inline rating"  title="Average Rating">
                    </div>
          </div>';
@@ -216,62 +217,88 @@ public function update_image_movie_ajax(Request $request){
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
-    {
-        $category = Category::pluck('title','id');
-        $genre = Genre::pluck('title','id');
-        $list_genre=Genre::all();
-        $country = Country::pluck('title','id');
-        return view('admincp.movie.form', compact('category','genre','country','list_genre'));
+  public function create()
+{
+    $category = Category::pluck('title','id');
+    $genre = Genre::pluck('title','id');
+    $list_genre = Genre::all();
+    $country = Country::pluck('title','id');
+    return view('admincp.movie.form', compact('category','genre','country','list_genre'));
+}
+
+public function store(Request $request)
+{
+    // Validate dữ liệu, đặc biệt là slug phải unique
+    $request->validate([
+        'title' => 'required|string|max:255',
+        'slug' => 'required|string|max:255|unique:movies,slug',
+        'trailer' => 'nullable|string',
+        'sotap' => 'nullable|integer',
+        'tags' => 'nullable|string',
+        'thoiluong' => 'nullable|string',
+        'resolution' => 'nullable|integer',
+        'phude' => 'nullable|integer',
+        'name_eng' => 'nullable|string|max:255',
+        'phim_hot' => 'nullable|integer',
+        'description' => 'nullable|string',
+        'status' => 'required|integer',
+        'category_id' => 'required|integer',
+        'thuocphim' => 'required|string',
+        'country_id' => 'required|integer',
+        'genre' => 'required|array',
+        'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
+    ], [
+        'slug.unique' => 'Phim này đã tồn tại. Vui lòng chọn phim khác!',
+        'slug.required' => 'Vui lòng nhập slug cho phim',
+        'title.required' => 'Vui lòng nhập tên phim',
+        'genre.required' => 'Vui lòng chọn ít nhất một thể loại'
+    ]);
+
+    $data = $request->all();
+
+    $movie = new Movie();
+    $movie->title = $data['title'];
+    $movie->trailer = $data['trailer'];
+    $movie->sotap = $data['sotap'];
+    $movie->tags = $data['tags'];
+    $movie->thoiluong = $data['thoiluong'];
+    $movie->resolution = $data['resolution'];
+    $movie->phude = $data['phude'];
+    $movie->slug = $data['slug'];
+    $movie->name_eng = $data['name_eng'];
+    $movie->phim_hot = $data['phim_hot'];
+    $movie->description = $data['description'];
+    $movie->status = $data['status'];
+    $movie->category_id = $data['category_id'];
+    $movie->thuocphim = $data['thuocphim'];
+    $movie->country_id = $data['country_id'];
+    $movie->count_views = rand(100,99999);
+    $movie->ngaytao = Carbon::now('Asia/Ho_Chi_Minh');
+    $movie->ngaycapnhat = Carbon::now('Asia/Ho_Chi_Minh');
+
+    // Fix: Lấy genre_id đầu tiên từ mảng genre
+    if(isset($data['genre']) && count($data['genre']) > 0) {
+        $movie->genre_id = $data['genre'][0];
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        $data = $request->all();
-       
-        $movie = new Movie();
-        $movie->title = $data['title'];
-        $movie->trailer = $data['trailer'];
-        $movie->sotap = $data['sotap'];
-        $movie->tags = $data['tags'];
-        $movie->thoiluong = $data['thoiluong'];
-        $movie->resolution = $data['resolution'];
-        $movie->phude = $data['phude'];
-        $movie->slug = $data['slug'];
-        $movie->name_eng = $data['name_eng'];
-        $movie->phim_hot = $data['phim_hot'];
-        $movie->description = $data['description'];
-        $movie->status = $data['status'];
-        $movie->category_id = $data['category_id'];
-        $movie->thuocphim = $data['thuocphim'];
-        $movie->country_id = $data['country_id'];
-        $movie->count_views=rand(100,99999);
-        $movie->ngaytao = Carbon::now('Asia/Ho_Chi_Minh');
-        $movie->ngaycapnhat = Carbon::now('Asia/Ho_Chi_Minh');
-        foreach($data['genre'] as $key => $gen){
-        $movie->genre_id =$gen[0];
-        }
-        $get_image = $request->file('image');
-
-        if($get_image){
-
-            $get_name_image = $get_image->getClientOriginalName();
-            $name_image = current(explode('.',$get_name_image));
-            $new_image = $name_image.rand(0,9999).'.'.$get_image->getClientOriginalExtension();
-            $get_image->move('uploads/movie/',$new_image);
-            $movie->image = $new_image;
-        }
-        $movie->save();
-        $movie->movie_genre()->attach($data['genre']);
-        toastr()->success('Thành công','Thêm phim mới thành công');
-        return redirect()->route('movie.index');
+    // Xử lý upload ảnh
+    $get_image = $request->file('image');
+    if($get_image) {
+        $get_name_image = $get_image->getClientOriginalName();
+        $name_image = current(explode('.', $get_name_image));
+        $new_image = $name_image . rand(0,9999) . '.' . $get_image->getClientOriginalExtension();
+        $get_image->move('uploads/movie/', $new_image);
+        $movie->image = $new_image;
     }
+
+    $movie->save();
+
+    // Attach nhiều thể loại cho phim
+    $movie->movie_genre()->attach($data['genre']);
+
+    toastr()->success('Thành công', 'Thêm phim mới thành công');
+    return redirect()->route('movie.index');
+}
 
     /**
      * Display the specified resource.
@@ -330,7 +357,7 @@ public function update_image_movie_ajax(Request $request){
         $movie->country_id = $data['country_id'];
         // $movie->count_views=rand(100,99999);
         $movie->ngaycapnhat = Carbon::now('Asia/Ho_Chi_Minh');
-      
+
         $get_image = $request->file('image');
 
         if($get_image){
@@ -348,8 +375,8 @@ public function update_image_movie_ajax(Request $request){
                     $movie->genre_id =$gen[0];
                 }
                  $movie->save();
-//Thêm nhiều thể loại cho phim  
-      
+//Thêm nhiều thể loại cho phim
+
         $movie->movie_genre()->sync($data['genre']);
      toastr()->success('Thành công','Cập nhật thành công');
         return redirect()->route('movie.index');

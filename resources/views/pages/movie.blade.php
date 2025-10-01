@@ -5,13 +5,13 @@
                <div class="panel-heading">
                   <div class="row">
                      <div class="col-xs-6">
-                        <div class="yoast_breadcrumb hidden-xs"><span><span><a href="{{route('category',[$movie->category->slug])}}">{{$movie->category->title}}</a> » 
+                        <div class="yoast_breadcrumb hidden-xs"><span><span><a href="{{route('category',[$movie->category->slug])}}">{{$movie->category->title}}</a> »
                            <span>
-                              <a href="{{route('country',[$movie->country->slug])}}">{{$movie->country->title}}</a> » 
+                              <a href="{{route('country',[$movie->country->slug])}}">{{$movie->country->title}}</a> »
                               @foreach($movie->movie_genre as $gen)
                                     <a href="{{route('genre',$gen->slug)}}">{{$gen->title}}</a> »
-                                    @endforeach 
-                              
+                                    @endforeach
+
                               <span class="breadcrumb_last" aria-current="page">{{$movie->title}}</span></span></span></span></div>
                      </div>
                   </div>
@@ -23,7 +23,7 @@
             <main id="main-contents" class="col-xs-12 col-sm-12 col-md-8">
                <section id="content" class="test">
                   <div class="clearfix wrap-content">
-                    
+
                      <div class="halim-movie-wrapper">
                         {{-- <div class="title-block">
                            <div id="bookmark" class="bookmark-img-animation primary_ribbon" data-id="38424">
@@ -36,7 +36,7 @@
                         <div class="movie_info col-xs-12">
                            <div class="movie-poster col-md-3">
                               <img class="movie-thumb" src="{{asset('uploads/movie/'.$movie->image)}}" alt="{{$movie->title}}">
-                             
+
                               @if($movie->phude!=3)
                               @if($episode_current_list_count>0)
                               <div class="bwa-content">
@@ -48,7 +48,7 @@
                               @endif
                               @else
                               <a href="#watch_trailer" style="display:block;" class="btn btn-primary watch_trailer">Xem Trailer</a>
-                             
+
                               @endif
                            </div>
                            <div class="film-poster col-md-9">
@@ -74,23 +74,23 @@
                                     Cam
                                     @else
                                     FullHD
-                                    
+
                                 @endif
                                  </span>
-                                
+
                                  <span class="episode">
                                     @if($movie->phude==0)
                                     Phụ đề
-                               
+
                                     @elseif($movie->phude==1)
                                     Thuyết minh
                                     @else
                                     Trailer
-                                
+
                                  </span>
                                  @endif
                               </li>
-                                 
+
                                  <li class="list-info-group-item">
                                     <!-- <ion-icon name="chevron-forward-outline"></ion-icon><span><ion-icon name="timer"></ion-icon> -->
                                        <lord-icon
@@ -128,25 +128,25 @@
     style="width:20px;height:20px">
 </lord-icon>Season</span> : {{$movie->season}}</li>
                                  @endif
-                               
+
                                  <li class="list-info-group-item"><span> <lord-icon
     src="https://cdn.lordicon.com/edxgdhxu.json"
     trigger="loop"
     delay="2000"
     style="width:20px;height:20px">
 </lord-icon>Thể loại</span> :
-                                    
+
                                     @foreach($movie->movie_genre as $gen)
                                     <a href="{{route('genre',$gen->slug)}}" rel="category tag">{{$gen->title}}</a>
-                                    @endforeach 
-                                    
+                                    @endforeach
+
                                  </li>
                                  <li class="list-info-group-item"><span><lord-icon
     src="https://cdn.lordicon.com/hiqmdfkt.json"
     trigger="loop"
     delay="2000"
     style="width:20px;height:20px">
-</lord-icon>Danh mục</span> : 
+</lord-icon>Danh mục</span> :
                                     <a href="{{route('category',$movie->category->slug)}}" rel="category tag">{{$movie->category->title}}</a>
                                  </li>
                                  <li class="list-info-group-item"><span>
@@ -157,27 +157,27 @@
     delay="1000"
     style="width:20px;height:20px">
 </lord-icon>
-                                 Quốc gia</span> : 
+                                 Quốc gia</span> :
                                     <a href="{{route('country',$movie->country->slug)}}" rel="tag">{{$movie->country->title}}</a>
                                  </li>
-                                 
+
                                  <li class="list-info-group-item"><span><lord-icon
     src="https://cdn.lordicon.com/fyuvwkhk.json"
   trigger="loop"
     delay="1000"
     style="width:20px;height:20px">
-</lord-icon>Tập phim mới nhất </span> : 
+</lord-icon>Tập phim mới nhất </span> :
                                     @if($episode_current_list_count>0)
                                     @if($movie->thuocphim=='phimbo')
-                                   
+
                                     @foreach($episode as $key =>$ep)
                                     <a href="{{url('xem-phim/'.$ep->movie->slug.'/tap-'.$ep->episode)}}" rel="tag">Tập {{$ep->episode}}</a>
                                     @endforeach
-                                    
+
                                     @elseif($movie->thuocphim=='phimle')
                                     @foreach($episode as $key =>$ep_le)
                                     <a href="{{url('xem-phim/'.$movie->slug.'/tap-'.$ep_le->episode)}}" rel="tag">{{$ep_le->episode}}</a>
-                                    
+
                                     @endforeach
                                     @endif
                                     @else
@@ -190,25 +190,25 @@
 
                                                     @php
 
-                                                      if($count<=$rating){ 
+                                                      if($count<=$rating){
                                                         $color = 'color:#ffcc00;'; //mau vang
                                                       }
                                                       else {
                                                         $color = 'color:#ccc;'; //mau xam
                                                       }
-                                                    
+
                                                     @endphp
-                                                  
-                                                    <li title="star_rating" 
 
-                                                    id="{{$movie->id}}-{{$count}}" 
-                                                    
-                                                    data-index="{{$count}}"  
-                                                    data-movie_id="{{$movie->id}}" 
+                                                    <li title="star_rating"
 
-                                                    data-rating="{{$rating}}" 
-                                                    class="rating" 
-                                                    style="cursor:pointer; {{$color}} 
+                                                    id="{{$movie->id}}-{{$count}}"
+
+                                                    data-index="{{$count}}"
+                                                    data-movie_id="{{$movie->id}}"
+
+                                                    data-rating="{{$rating}}"
+                                                    class="rating"
+                                                    style="cursor:pointer; {{$color}}
 
                                                     font-size:30px;">&#9733;</li>
 
@@ -244,7 +244,7 @@
                               @php
                                   $tags = array();
                                   $tags = explode(',', $movie->tags);
-                                 //  print_r($tags); 
+                                 //  print_r($tags);
                               @endphp
                               @foreach($tags as $key => $tag)
                              <a href="{{url('tag/'.$tag)}}" >{{$tag}}</a>
@@ -258,7 +258,7 @@
                      </div>
                       {{-- Comment facebook --}}
                       <div class="section-bar clearfix">
-                        <h2 class="section-title"><span style="color:#ffed4d">Bình luận</span></h2>            
+                        <h2 class="section-title"><span style="color:#ffed4d">Bình luận</span></h2>
                      </div>
                      <div class="entry-content htmlwrap clearfix">
                         @php
@@ -280,8 +280,8 @@
                      <div class="entry-content htmlwrap clearfix">
                         <div class="video-item halim-entry-box">
                            <article id="watch_trailer" class="item-content">
-                              <iframe width="100%" height="400" src="https://www.youtube.com/embed/{{$movie->trailer}}" title="YouTube video player" 
-                              frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                              <iframe width="100%" height="400" src="https://www.youtube.com/embed/{{$movie->trailer}}" title="YouTube video player"
+                              frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                               allowfullscreen></iframe>
                            </article>
                         </div>
@@ -311,7 +311,7 @@
                                     Cam
                                     @else
                                     FullHD
-                                   
+
                                 @endif
                                  </span><span class="episode">
                                  <!--    <i class="fa fa-play" aria-hidden="true"></i> -->
@@ -328,7 +328,7 @@
                                     @else
                                     Trailer
                                 @endif
-                                    </span> 
+                                    </span>
                                  <div class="icon_overlay"></div>
                                  <div class="halim-post-title-box">
                                     <div class="halim-post-title ">
@@ -340,10 +340,10 @@
                            </div>
                         </article>
                         @endforeach
-                       
+
                      </div>
                      <script>
-                        $(document).ready(function($) {				
+                        $(document).ready(function($) {
                         var owl = $('#halim_related_movies-2');
                         owl.owlCarousel({loop: true,margin: 4,autoplay: true,autoplayTimeout: 4000,autoplayHoverPause: true,nav: true,navText: ['<i class="hl-down-open rotate-left"></i>', '<i class="hl-down-open rotate-right"></i>'],responsiveClass: true,responsive: {0: {items:2},480: {items:3}, 600: {items:4},1000: {items: 4}}})});
                      </script>

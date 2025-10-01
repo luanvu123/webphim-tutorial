@@ -17,7 +17,7 @@ use DB;
 class IndexController extends Controller
 {
      public function locphim(){
-        
+
         $sapxep=$_GET['order'];
         $genre_get=$_GET['genre'];
         $country_get=$_GET['country'];
@@ -46,11 +46,11 @@ class IndexController extends Controller
        $movie = $movie->orderBy('ngaycapnhat','DESC')->paginate(32);
        return view('pages.locphim', compact('movie','meta_title','meta_description','meta_image'));
         }
-        
+
      }
     public function timkiem(){
         if(isset($_GET['search'])){
-        $search =$_GET['search'];     
+        $search =$_GET['search'];
         $movie = Movie::withCount('episode')->where('status',1)->where('title','LIKE','%'.$search.'%')->orderBy('ngaycapnhat','DESC')->paginate(32);
          $meta_title= 'Phim '.$search;
         $meta_description='Phim hay 2022';
@@ -65,8 +65,25 @@ class IndexController extends Controller
         $meta_title=$info->title;
         $meta_description=$info->description;
         $meta_image=url('uploads/movie/de_the_lego_movie1333.jpg');
-        $phimhot = Movie::withCount('episode')->where('phim_hot',1)->where('status',1)->orderBy('ngaycapnhat','DESC')->get();
-        $category_home = Category::with(['movie'=>function($q){$q->withCount('episode')->where('status',1);}])->orderBy('id','DESC')->where('status',1)->get();
+      $phimhot = Movie::addSelect([
+        'episode_count' => Episode::selectRaw('MAX(CAST(episode as UNSIGNED))')
+            ->whereColumn('movie_id', 'movies.id')
+    ])
+    ->where('phim_hot',1)
+    ->where('status',1)
+    ->orderBy('ngaycapnhat','DESC')
+    ->get();
+
+$category_home = Category::with(['movie' => function($q){
+        $q->addSelect([
+            'episode_count' => Episode::selectRaw('MAX(CAST(episode as UNSIGNED))')
+                ->whereColumn('movie_id', 'movies.id')
+        ])->where('status',1);
+    }])
+    ->orderBy('id','DESC')
+    ->where('status',1)
+    ->get();
+
     	return view('pages.home', compact('category_home','phimhot','meta_title','meta_description','meta_image'));
     }
     public function category($slug){
@@ -121,7 +138,7 @@ class IndexController extends Controller
         $meta_description=$movie->description;
         $meta_image=url('uploads/movie/'.$movie->image);
         $episode_tapdau = Episode::with('movie')->where('movie_id',$movie->id)->orderBy('episode','ASC')->take(1)->first();
-        
+
        $related = Movie::with('category','genre','country')->where('category_id',$movie->category->id)->orderBy(DB::raw('RAND()'))->whereNotIn('slug',[$slug])->get();
     	//Lấy 3 tập gần nhất
        $episode =Episode::with('movie')->where('movie_id',$movie->id)->orderBy('updated_at','DESC')->take(3)->get();
