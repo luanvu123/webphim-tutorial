@@ -41,22 +41,6 @@ class EpisodeController extends Controller
     public function store(Request $request)
     {
         $data = $request->all();
-        // $data = $request->validate(
-        //     [
-        //           'episode'=>'required|unique:episodes',
-        //           'movie_id'=>'required',
-        //           'link'=>'required',
-        //           'created_at'=>'optional',
-        //           'created_at'=>'optional',
-        //       ],
-        //       [
-
-        //            'episode.unique'=>'Tập phim đã tồn tại!',
-        //        ]
-        //       );
-        // $episode_check= Episode::where('episode',$data['episode'])->where('movie_id',$data['movie_id'])->count();
-        // if($episode_check>0){
-        // }else{
         $ep = new Episode();
         $ep->movie_id = $data['movie_id'];
         $ep->linkphim = $data['link'];
@@ -146,7 +130,7 @@ class EpisodeController extends Controller
                 }
           }else{
             $output.='<option value="HD">HD</option><option value="FullHD">FullHD</option><option value="Cam">Cam</option><option value="HDCam">HDCam</option>';
-           
+
           }
         echo $output;
     }
